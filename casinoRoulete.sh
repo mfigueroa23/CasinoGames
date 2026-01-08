@@ -23,7 +23,17 @@ trap ctrl_c INT
 function helpPanel () {
   echo -e "\n${greenColour}[i]${endColour} ${grayColour}Para el uso correcto de la herramienta se debe proporcionar los siguientes parametros:${endColour}\n"
   echo -e "\t${blueColour}[+]${endColour} ${greenColour}-m${endColour} ${yellowColour}<numero>${endColour}\t ${grayColour}Dinero a utilizar (ficticio)${endColour}"
-  echo -e "\t${blueColour}[+]${endColour} ${greenColour}-t${endColour} ${yellowColour}<nombre>${endColour}\t ${grayColour}Tecnica a utilizar [ martingala ]${endColour}\n"
+  echo -e "\t${blueColour}[+]${endColour} ${greenColour}-t${endColour} ${yellowColour}<nombre>${endColour}\t ${grayColour}Tecnica a utilizar [ martingala, labouchereInversa ]${endColour}\n"
+}
+
+# Funcion tecnica martingala
+funcion martingala () {
+  echo -e "\n${greenColour}[+]${endColour} Utilizando tecnica ${yellowColour}Martingala${endColour}\n"
+}
+
+# Funcion tecnica labouchere inversa
+function labouchereInversa () {
+  echo -e "\n${greenColour}[+]${endColour} Utilizando tecnica ${yellowColour}Labouchere Inversa${endColour}\n"
 }
 
 # Definiendo opciones validas del programa
@@ -39,7 +49,18 @@ done
 if [ $money ] && [ $technique ]; then
   echo -e "\n${greenColour}[+]${endColour} ${grayColour}Se dará incio al juego. Propiedades indicadas:${endColour}\n"
   echo -e "\t${blueColour}[i]${endColour} ${grayColour}Dinero:${endColour}\t ${greenColour}\$$money${endColour}"
-  echo -e "\t${blueColour}[i]${endColour} ${grayColour}Tecnica:${endColour}\t ${yellowColour}$technique${endColour}\n"
+  echo -e "\t${blueColour}[i]${endColour} ${grayColour}Tecnica:${endColour}\t ${yellowColour}$technique${endColour}"
+  if [ $technique = "martingala" ]; then
+    martingala
+  elif [ $technique = "labouchereInversa" ]; then
+    labouchereInversa
+  else
+    echo -e "\n${redColour}[!]${endColour} ${grayColour}Tecnica invalida. Las tecnicas disponible son:${endColour}\n"
+    echo -e "\t${blueColour}I.${endColour}\t${yellowColour}martingala${endColour}"
+    echo -e "\t${blueColour}II.${endColour}\t${yellowColour}labouchereInversa${endColour}\n"
+    exit 1
+  fi
 else
   helpPanel
+  exit 1
 fi
