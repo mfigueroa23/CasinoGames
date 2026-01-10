@@ -40,32 +40,50 @@ funcion martingala () {
   echo -e "\n${blueColour}[i]${endColour} ${grayColour}Realizando apuesta de ${greenColour}\$$bet${endColour} ${grayColour}continuamente a los numeros${endColour} ${yellowColour}$place_bet${endColour}\n"
   tput civis
   bet_backup=$bet
+  total_plays=0
+  bad_results=""
+  max_money_ammount=$money
+  max_money_ammount_play=0
   while true; do
     if [ "$money" -eq 0 ]; then
       echo -e "${redColour}[!] Te has quedado sin dinero \$$money${endColour}\n"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha habido un total de${endColour} ${yellowColour}$total_plays${yellowColour} ${grayColour}jugadas${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a tener un maximo de${endColour} ${greenColour}\$$max_money_ammount${endColour} ${grayColour}en la jugada${endColour} ${yellowColour}$max_money_ammount_play${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Los rasultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
       tput cnorm && exit 1
     elif [ "$bet" -gt "$money" ]; then
       echo -e "${redColour}[!] No hay dinero para realizar la apuesta"
       echo -e "${redColour}[!]${endColour} ${grayColour}Dinero actual:${endColour} ${greenColour}\$$money${endColour}\n"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha habido un total de${endColour} ${yellowColour}$total_plays${yellowColour} ${grayColour}jugadas${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a tener un maximo de${endColour} ${greenColour}\$$max_money_ammount${endColour} ${grayColour}en la jugada${endColour} ${yellowColour}$max_money_ammount_play${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Los rasultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
       tput cnorm && exit 1
     fi
     money=$(($money-$bet))
     random_number="$(($RANDOM % 37))"
+    let total_plays+=1
     echo -e "${greenColour}[+]${endColour} ${grayColour}Apostando:${endColour} ${yellowColour}\$$bet${endColour} ${grayColour}| Dinero Restante:${endColour} ${greenColour}\$$money${endColour}"
     echo -e "${greenColour}[+]${endColour} ${grayColour}Ha salido el numero:${endColour} ${yellowColour}$random_number${endColour}"
     if [ "$(($random_number % 2))" -eq 0 ]; then
       if [ "$random_number" -eq 0 ]; then
         echo -e "\t${blueColour}[i]${endColour} ${grayColour}El numero es${endColour} ${yellowColour}0${endColour}${grayColour}. Hemos perdido${endColour}"
+        bad_results+="$random_number "
       fi
       echo -e "\t${blueColour}[i]${endColour} ${grayColour}El numero es${endColour} ${yellowColour}par${endColour}"
       if [ "$place_bet" = "par" ]; then
         reward=$(($bet*2))
         money=$(($money+$reward))
+        bad_results=""
+        if [ $money -ge $max_money_ammount ]; then
+          max_money_ammount=$money
+          max_money_ammount_play=$total_plays
+        fi
         echo -e "\t${greenColour}[+] ¡Has Ganado \$$reward!${endColour}"
         echo -e "\t${blueColour}[i]${endColour} ${grayColour}Dinero Actual:${endColour} ${greenColour}\$$money${endColour}\n"
         bet=$bet_backup
       else
         bet=$(($bet*2))
+        bad_results+="$random_number "
         echo -e "\t${redColour}[!] ¡Has Perdido!${redColour}"
         echo -e "\t${redColour}[!]${endColour} ${grayColour}Apostando el doble${endColour} ${yellowColour}\$$bet${endColour}\n"
       fi
@@ -74,16 +92,22 @@ funcion martingala () {
       if [ "$place_bet" = "impar" ]; then
         reward=$(($bet*2))
         money=$(($money+$reward))
+        bad_results=""
+        if [ $money -ge $max_money_ammount ]; then
+          max_money_ammount=$money
+          max_money_ammount_play=$total_plays
+        fi
         echo -e "\t${greenColour}[+] ¡Has Ganado \$$reward!${endColour}"
         echo -e "\t${blueColour}[i]${endColour} ${grayColour}Dinero Actual:${endColour} ${greenColour}\$$money${endColour}\n"
         bet=$bet_backup
       else
         bet=$(($bet*2))
+        bad_results+="$random_number "
         echo -e "\t${redColour}[!] ¡Has Perdido!${redColour}"
         echo -e "\t${redColour}[!]${endColour} ${grayColour}Apostando el doble${endColour} ${yellowColour}\$$bet${endColour}\n"
       fi
     fi
-    sleep 3
+    sleep 0.5
   done
   tput cnorm
 }
