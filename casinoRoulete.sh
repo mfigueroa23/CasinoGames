@@ -44,19 +44,25 @@ funcion martingala () {
   bad_results=""
   max_money_ammount=$money
   max_money_ammount_play=0
+  total_win=0
+  total_lose=0
   while true; do
     if [ "$money" -eq 0 ]; then
       echo -e "${redColour}[!] Te has quedado sin dinero \$$money${endColour}\n"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha habido un total de${endColour} ${yellowColour}$total_plays${yellowColour} ${grayColour}jugadas${endColour}"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a tener un maximo de${endColour} ${greenColour}\$$max_money_ammount${endColour} ${grayColour}en la jugada${endColour} ${yellowColour}$max_money_ammount_play${endColour}"
-      echo -e "${blueColour}[i]${endColour} ${grayColour}Los rasultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a ganar un total de${endColour} ${greenColour}$total_win${endColour} ${grayColour}veces${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a perder un total de${endColour} ${redColour}$total_lose${endColour} ${grayColour}veces${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Los resultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
       tput cnorm && exit 1
     elif [ "$bet" -gt "$money" ]; then
       echo -e "${redColour}[!] No hay dinero para realizar la apuesta"
       echo -e "${redColour}[!]${endColour} ${grayColour}Dinero actual:${endColour} ${greenColour}\$$money${endColour}\n"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha habido un total de${endColour} ${yellowColour}$total_plays${yellowColour} ${grayColour}jugadas${endColour}"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a tener un maximo de${endColour} ${greenColour}\$$max_money_ammount${endColour} ${grayColour}en la jugada${endColour} ${yellowColour}$max_money_ammount_play${endColour}"
-      echo -e "${blueColour}[i]${endColour} ${grayColour}Los rasultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a ganar un total de${endColour} ${greenColour}$total_win${endColour} ${grayColour}veces${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a perder un total de${endColour} ${redColour}$total_lose${endColour} ${grayColour}veces${endColour}"
+      echo -e "${blueColour}[i]${endColour} ${grayColour}Los resultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
       tput cnorm && exit 1
     fi
     money=$(($money-$bet))
@@ -74,6 +80,7 @@ funcion martingala () {
         reward=$(($bet*2))
         money=$(($money+$reward))
         bad_results=""
+        let total_win+=1
         if [ $money -ge $max_money_ammount ]; then
           max_money_ammount=$money
           max_money_ammount_play=$total_plays
@@ -84,6 +91,7 @@ funcion martingala () {
       else
         bet=$(($bet*2))
         bad_results+="$random_number "
+        let total_lose+=1
         echo -e "\t${redColour}[!] ¡Has Perdido!${redColour}"
         echo -e "\t${redColour}[!]${endColour} ${grayColour}Apostando el doble${endColour} ${yellowColour}\$$bet${endColour}\n"
       fi
@@ -93,6 +101,7 @@ funcion martingala () {
         reward=$(($bet*2))
         money=$(($money+$reward))
         bad_results=""
+        let total_win+=1
         if [ $money -ge $max_money_ammount ]; then
           max_money_ammount=$money
           max_money_ammount_play=$total_plays
@@ -103,11 +112,12 @@ funcion martingala () {
       else
         bet=$(($bet*2))
         bad_results+="$random_number "
+        let total_lose+=1
         echo -e "\t${redColour}[!] ¡Has Perdido!${redColour}"
         echo -e "\t${redColour}[!]${endColour} ${grayColour}Apostando el doble${endColour} ${yellowColour}\$$bet${endColour}\n"
       fi
     fi
-    sleep 0.5
+    sleep 0.25
   done
   tput cnorm
 }
