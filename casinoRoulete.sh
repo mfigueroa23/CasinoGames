@@ -56,7 +56,7 @@ funcion martingala () {
       echo -e "${blueColour}[i]${endColour} ${grayColour}Los resultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
       tput cnorm && exit 1
     elif [ "$bet" -gt "$money" ]; then
-      echo -e "${redColour}[!] No hay dinero para realizar la apuesta"
+      echo -e "${redColour}[!] No hay dinero para realizar la apuesta de${endColour} ${yellowColour}$bet${endColour}"
       echo -e "${redColour}[!]${endColour} ${grayColour}Dinero actual:${endColour} ${greenColour}\$$money${endColour}\n"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha habido un total de${endColour} ${yellowColour}$total_plays${yellowColour} ${grayColour}jugadas${endColour}"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a tener un maximo de${endColour} ${greenColour}\$$max_money_ammount${endColour} ${grayColour}en la jugada${endColour} ${yellowColour}$max_money_ammount_play${endColour}"
@@ -139,6 +139,17 @@ function labouchereInversa () {
   total_lose=0
   bad_results=""
   while true; do
+    echo -e "\n${blueColour}[i]${endColour} ${grayColour}Nuestra secuencia es${endColour} ${greenColour}[ ${my_sequence[@]} ]${endColour}"
+    if [ "${#my_sequence[@]}" -gt 1 ]; then
+      bet=$((${my_sequence[1]} + ${my_sequence[-1]}))
+    elif [ "${#my_sequence[@]}" -eq 1 ]; then
+      bet=${my_sequence[1]}
+    elif [ "${#my_sequence[@]}" -eq 0 ]; then
+      my_sequence=(1 2 3 4)
+      bet=$((${my_sequence[1]} + ${my_sequence[-1]}))
+      echo -e "${redColour}[!] No hay elementos en la sequencia para realizar la apuesta${endColour}"
+      echo -e "${greenColour}[+]${endColour} ${grayColour}Reestableciendo la secuencia a:${endColour} ${greenColour}[ ${my_sequence[@]} ]${endColour}\n" 
+    fi
     if [ "$money" -eq 0 ]; then
       echo -e "${redColour}[!] Te has quedado sin dinero \$$money${endColour}\n"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha habido un total de${endColour} ${yellowColour}$total_plays${yellowColour} ${grayColour}jugadas${endColour}"
@@ -148,7 +159,7 @@ function labouchereInversa () {
       echo -e "${blueColour}[i]${endColour} ${grayColour}Los resultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
       tput cnorm && exit 1
     elif [ "$bet" -gt "$money" ]; then
-      echo -e "${redColour}[!] No hay dinero para realizar la apuesta"
+      echo -e "${redColour}[!] No hay dinero para realizar la apuesta de${endColour} ${yellowColour}\$$bet${endColour}"
       echo -e "${redColour}[!]${endColour} ${grayColour}Dinero actual:${endColour} ${greenColour}\$$money${endColour}\n"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha habido un total de${endColour} ${yellowColour}$total_plays${yellowColour} ${grayColour}jugadas${endColour}"
       echo -e "${blueColour}[i]${endColour} ${grayColour}Ha llegado a tener un maximo de${endColour} ${greenColour}\$$max_money_ammount${endColour} ${grayColour}en la jugada${endColour} ${yellowColour}$max_money_ammount_play${endColour}"
@@ -157,13 +168,7 @@ function labouchereInversa () {
       echo -e "${blueColour}[i]${endColour} ${grayColour}Los resultados malos obtenidos son:${endColourColour} ${yellowColour}$bad_results${yellowColour}\n"
       tput cnorm && exit 1
     fi
-    echo -e "\n${blueColour}[i]${endColour} ${grayColour}Nuestra secuencia es${endColour} ${greenColour}[ ${my_sequence[@]} ]${endColour}"
-    if [ "${#my_sequence[@]}" -ne 1 ]; then
-      bet=$((${my_sequence[1]} + ${my_sequence[-1]}))
-    elif [ "${#my_sequence[@]}" -eq 1 ]; then
-      bet=${my_sequence[1]}
-    fi
-    money=$(($money - $bet))
+    money=$(($money-$bet))
     random_number=$(($RANDOM % 37))
     let total_plays+=1
     echo -e "${blueColour}[i]${endColour} ${grayColour}Realizando apuesta de ${greenColour}\$$bet${endColour} ${grayColour}continuamente a los numeros${endColour} ${yellowColour}$place_bet${endColour}\n"
@@ -171,14 +176,19 @@ function labouchereInversa () {
     echo -e "${greenColour}[+]${endColour} ${grayColour}Ha salido el numero:${endColour} ${yellowColour}$random_number${endColour}"
     if [ "$(($random_number % 2))" -eq 0 ]; then
       if [ "$random_number" -eq 0 ]; then
-        echo -e "\t${blueColour}[i]${endColour} ${grayColour}El numero es${endColour} ${yellowColour}0${endColour}${grayColour}. Hemos perdido${endColour}"
-        bad_results="$random_number "
+        bad_results+="$random_number "
         let total_lose+=1
+        unset 'my_sequence[1]'
+        unset 'my_sequence[-1]' 2>/dev/null
+        my_sequence=(${my_sequence[@]})
+        echo -e "\t${redColour}[!] ¡Has Perdido!${redColour}"
+        echo -e "\t${blueColour}[!]${endColour} ${grayColour}La secuencia se ha actualizando.${endColour} ${yellowColour}Eliminando extremos.${endColour}\n"
       fi
       echo -e "\t${blueColour}[i]${endColour} ${grayColour}El numero es${endColour} ${yellowColour}par${endColour}"
       if [ "$place_bet" = "par" ]; then
         reward=$(($bet*2))
-        money=$(($money + $bet))
+        money=$(($money+$reward))
+        bad_results=""
         let total_win+=1
         if [ $money -ge $max_money_ammount ]; then
           max_money_ammount=$money
@@ -189,16 +199,21 @@ function labouchereInversa () {
         echo -e "\t${greenColour}[+] ¡Has Ganado \$$reward!${endColour}"
         echo -e "\t${blueColour}[i]${endColour} ${grayColour}Dinero Actual:${endColour} ${greenColour}\$$money${endColour}\n"
       else
-        bad_results="$random_number "
+        bad_results+="$random_number "
         let total_lose+=1
+        unset 'my_sequence[1]'
+        unset 'my_sequence[-1]' 2>/dev/null
+        my_sequence=(${my_sequence[@]})
         echo -e "\t${redColour}[!] ¡Has Perdido!${redColour}"
+        echo -e "\t${blueColour}[!]${endColour} ${grayColour}La secuencia se ha actualizando.${endColour} ${yellowColour}Eliminando extremos.${endColour}\n"
       fi
     else
       echo -e "\t${blueColour}[i]${endColour} ${grayColour}El numero es${endColour} ${yellowColour}impar${endColour}"
       if [ "$place_bet" = "impar" ]; then
         reward=$(($bet*2))
-        money=$(($money + $bet))
+        money=$(($money+$reward))
         let total_win+=1
+        bad_results=""
         if [ $money -ge $max_money_ammount ]; then
           max_money_ammount=$money
           max_money_ammount_play=$total_plays
@@ -208,9 +223,13 @@ function labouchereInversa () {
         echo -e "\t${greenColour}[+] ¡Has Ganado \$$reward!${endColour}"
         echo -e "\t${blueColour}[i]${endColour} ${grayColour}Dinero Actual:${endColour} ${greenColour}\$$money${endColour}\n"
       else
-        bad_results="$random_number "
+        bad_results+="$random_number "
         let total_lose+=1
+        unset 'my_sequence[1]'
+        unset 'my_sequence[-1]' 2>/dev/null
+        my_sequence=(${my_sequence[@]})
         echo -e "\t${redColour}[!] ¡Has Perdido!${redColour}"
+        echo -e "\t${blueColour}[!]${endColour} ${grayColour}La secuencia se ha actualizando.${endColour} ${yellowColour}Eliminando extremos.${endColour}\n"
       fi
     fi
     sleep 0.25
