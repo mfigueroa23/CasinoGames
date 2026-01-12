@@ -148,7 +148,7 @@ function labouchereInversa () {
       my_sequence=(1 2 3 4)
       bet=$((${my_sequence[1]} + ${my_sequence[-1]}))
       echo -e "${redColour}[!] No hay elementos en la sequencia para realizar la apuesta${endColour}"
-      echo -e "${greenColour}[+]${endColour} ${grayColour}Reestableciendo la secuencia a:${endColour} ${greenColour}[ ${my_sequence[@]} ]${endColour}\n" 
+      echo -e "${greenColour}[+]${endColour} ${grayColour}Restableciendo la secuencia a:${endColour} ${greenColour}[ ${my_sequence[@]} ]${endColour}\n" 
     fi
     if [ "$money" -eq 0 ]; then
       echo -e "${redColour}[!] Te has quedado sin dinero \$$money${endColour}\n"
